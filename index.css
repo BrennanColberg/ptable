@@ -1,3 +1,38 @@
+td {
+	height: 80px;
+	width: 80px;
+	position: relative;
+}
+
 .element {
+	box-sizing: border-box;
+	border: 3px solid black;
+	padding: 4px 6px;
+	margin-left: var(--dividers);
 	text-align: center;
+	font-family: sans-serif;
+	font-weight: bold;
+	background-color: #eee;
+}
+
+.element span {
+	display: block;
+}
+
+.element .number {
+	position: absolute;
+	right: 5px;
+	font-size: 10pt;
+}
+
+.element .symbol {
+	font-size: 24pt;
+}
+
+.element .name {
+	font-size: 11pt;
+}
+
+.element .mass {
+	font-size: 9pt;
 }

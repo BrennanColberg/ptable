@@ -1,6 +1,18 @@
 "use strict";
 (function () {
 
+	function $(selector) {
+		let result = document.querySelectorAll(selector);
+		return result.length > 1 ? result : result[0];
+	}
+
+	function ce(type, content, className) {
+		let result = document.createElement(type);
+		if (content) result.textContent = content;
+		if (className) result.className = className;
+		return result;
+	}
+
 	const NORMAL_LAYOUT = [
 		[1, 1],
 		[2, 6],
@@ -21,26 +33,12 @@
 		[17, 15]
 	];
 
-	function $(selector) {
-		let result = document.querySelectorAll(selector);
-		return result.length > 1 ? result : result[0];
-	}
-
-	function ce(type, content) {
-		let result = document.createElement(type);
-		if (content) result.textContent = content;
-		return result;
-	}
-
-	const ROWS = 7,
-		COLUMNS = 18;
-
 	window.addEventListener("load", function () {
-		generateHTML($("table")[0], NORMAL_LAYOUT);
-		// generateHTML($("table")[1], EXPANDED_LAYOUT);
+		fillTableHTML($("table")[0], NORMAL_LAYOUT);
+		fillTableHTML($("table")[1], EXPANDED_LAYOUT);
 	});
 
-	function generateHTML(parentDOM, layout) {
+	function fillTableHTML(parentDOM, layout) {
 		// gets larger dimensions for iterator
 		let rowCount = layout.length;
 		let columnCount = 0;
@@ -60,20 +58,26 @@
 			for (let col = 1; col <= columnCount; col++) {
 				let isFrontElement = col <= rowLayout[0];
 				let isBackElement = columnCount - col < rowLayout[1];
-				let cellDOM = ce("td");
 				// adds count for L/A series, etc (counted but can't see)
 				if (!isFrontElement && !addedInvisibleCount && rowLayout[2]) {
 					counter += rowLayout[2];
 					addedInvisibleCount = true;
 				}
-				if (isFrontElement || isBackElement) {
-					cellDOM.textContent = counter++;
-					cellDOM.className = "element";
-				}
-				rowDOM.appendChild(cellDOM);
+				rowDOM.appendChild((isFrontElement || isBackElement) ?
+					generateElementHTML(counter++) : // element
+					ce("td") // non-element
+				);
 			}
 			parentDOM.appendChild(rowDOM);
 		}
+	}
+
+	function generateElementHTML(atomicNumber) {
+		let cellDOM = ce("td");
+		cellDOM.className = "element";
+		cellDOM.appendChild(ce("span", atomicNumber, "number"));
+		console.log(cellDOM);
+		return cellDOM;
 	}
 
 })();
