@@ -1,18 +1,23 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald');
+
+table {
+	table-layout: fixed;
+}
+
 td {
-	height: 80px;
-	width: 80px;
+	box-sizing: border-box;
+	/* height & width not working for some reason, tables are weird */
+	/*	height: 100px;
+		width: 100px; */
+	padding: 10px;
 	position: relative;
 }
 
 .element {
-	box-sizing: border-box;
 	border: 3px solid black;
-	padding: 4px 6px;
-	margin-left: var(--dividers);
 	text-align: center;
 	font-family: sans-serif;
 	font-weight: bold;
-	background-color: #eee;
 }
 
 .element span {
@@ -22,7 +27,8 @@ td {
 .element .number {
 	position: absolute;
 	right: 5px;
-	font-size: 10pt;
+	top: 5px;
+	font-size: 12pt;
 }
 
 .element .symbol {
@@ -31,6 +37,7 @@ td {
 
 .element .name {
 	font-size: 11pt;
+	font-family: "Oswald";
 }
 
 .element .mass {
