@@ -77,7 +77,6 @@
 		// Credit: https://github.com/Bowserinator
 		ajaxGET("https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json", function (json) {
 			elements = JSON.parse(json).elements;
-			console.log(elements);
 			fillTableHTML($("table")[0], NORMAL_LAYOUT);
 			// fillTableHTML($("table")[1], EXPANDED_LAYOUT);
 			setInterval(incrementElementColors, 10);
@@ -92,8 +91,6 @@
 			let entry = layout[i];
 			columnCount = Math.max(columnCount, entry[0] + entry[1]);
 		}
-
-		console.log(rowCount + " rows of " + columnCount);
 
 		// iterates and creates DOM
 		let elementIndex = 0;
@@ -133,14 +130,12 @@
 		if (name) cellDOM.appendChild(ce("span", name, "name"));
 		if (mass) cellDOM.appendChild(ce("span", mass, "mass"));
 		calculateElementColor(cellDOM, index, 0);
-		console.log(cellDOM);
 		elementDOMs.push(cellDOM);
 		return cellDOM;
 	}
 
 	function incrementElementColors() {
 		colorIndex++;
-		console.log("calculating " + colorIndex);
 		for (let i = 0; i < elementDOMs.length; i++) {
 			calculateElementColor(elementDOMs[i], i, colorIndex);
 		}
@@ -160,7 +155,7 @@
 				v %= 256;
 			else if (rotations % 2 === 1)
 				v = 255 - (v % 256);
-			return (v / 255) * (max - min) + min;
+			return Math.floor((v / 255) * (max - min) + min);
 		}
 		r = treatColorDigit(r);
 		g = treatColorDigit(g);
