@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Oswald');
 
+body {
+	--fade-time: 100ms;
+}
+
 table {
 	table-layout: fixed;
 }
@@ -15,6 +19,12 @@ td {
 }
 
 .element {
+	-webkit-transition-property: background-color;
+	-webkit-transition-duration: var(--fade-time);
+	-webkit-transition-timing-function: linear;
+	transition-property: background-color;
+	transition-duration: var(--fade-time);
+	transition-timing-function: linear;
 	border: 3px solid black;
 	text-align: center;
 	font-family: sans-serif;

@@ -44,6 +44,7 @@
 		return result.length > 1 ? result : result[0];
 	}
 
+	// layout of the standard periodic table
 	const NORMAL_LAYOUT = [
 		[1, 1],
 		[2, 6],
@@ -54,6 +55,7 @@
 		[3, 15, 14]
 	]
 
+	// layout of a periodic table with the L/A series expanded
 	const EXPANDED_LAYOUT = [
 		[1, 1],
 		[2, 6],
@@ -63,6 +65,9 @@
 		[17, 15],
 		[17, 15]
 	];
+
+	// millisecond period between color updates
+	const FADE_DELAY = 200;
 
 	// JSON of all elements
 	let elements = undefined;
@@ -78,8 +83,9 @@
 		ajaxGET("https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json", function (json) {
 			elements = JSON.parse(json).elements;
 			fillTableHTML($("table")[0], NORMAL_LAYOUT);
-			// fillTableHTML($("table")[1], EXPANDED_LAYOUT);
-			setInterval(incrementElementColors, 10);
+			setInterval(incrementElementColors, FADE_DELAY);
+			$("body").style.setProperty("--fade-time", FADE_DELAY + "ms");
+
 		});
 	});
 
@@ -135,17 +141,17 @@
 	}
 
 	function incrementElementColors() {
-		colorIndex++;
+		colorIndex += 15;
 		for (let i = 0; i < elementDOMs.length; i++) {
 			calculateElementColor(elementDOMs[i], i, colorIndex);
 		}
 	}
 
 	function calculateElementColor(dom, atomicIndex, index) {
-		let r = index,
-			g = atomicIndex + index,
-			b = atomicIndex * 2 + index;
-		setColor(dom, r, g, b, 80, 200);
+		let r = (118 - atomicIndex) + index,
+			g = atomicIndex + index * 1.1,
+			b = atomicIndex * 2 + index * 1.2;
+		setColor(dom, r, g, b, 125, 225);
 	}
 
 	function setColor(dom, r, g, b, min, max) {
