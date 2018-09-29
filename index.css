@@ -6,10 +6,11 @@ table {
 
 td {
 	box-sizing: border-box;
-	/* height & width not working for some reason, tables are weird */
-	/*	height: 100px;
-		width: 100px; */
 	padding: 10px;
+	width: 100px;
+	height: 100px;
+	min-width: 100px;
+	min-height: 100px;
 	position: relative;
 }
 
