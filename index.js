@@ -65,7 +65,11 @@
 	];
 
 	// JSON of all elements
-	var elements = undefined;
+	let elements = undefined;
+	// generated DOM elements
+	let elementDOMs = [];
+	// index for fading colors
+	let colorIndex = 0;
 
 	window.addEventListener("load", function () {
 		// querying someone else's elements data JSON because it exists so
@@ -75,7 +79,8 @@
 			elements = JSON.parse(json).elements;
 			console.log(elements);
 			fillTableHTML($("table")[0], NORMAL_LAYOUT);
-			fillTableHTML($("table")[1], EXPANDED_LAYOUT);
+			// fillTableHTML($("table")[1], EXPANDED_LAYOUT);
+			setInterval(incrementElementColors, 10);
 		});
 	});
 
@@ -120,12 +125,47 @@
 		let symbol = elements[index].symbol;
 		let name = elements[index].name;
 		let mass = Math.round(elements[index].atomic_mass * 1000) / 1000;
+		let r = Math.random() * 255,
+			g = 255 - index,
+			b = 2 * index;
 		if (number) cellDOM.appendChild(ce("span", number, "number"));
 		if (symbol) cellDOM.appendChild(ce("span", symbol, "symbol"));
 		if (name) cellDOM.appendChild(ce("span", name, "name"));
 		if (mass) cellDOM.appendChild(ce("span", mass, "mass"));
+		calculateElementColor(cellDOM, index, 0);
 		console.log(cellDOM);
+		elementDOMs.push(cellDOM);
 		return cellDOM;
+	}
+
+	function incrementElementColors() {
+		colorIndex++;
+		console.log("calculating " + colorIndex);
+		for (let i = 0; i < elementDOMs.length; i++) {
+			calculateElementColor(elementDOMs[i], i, colorIndex);
+		}
+	}
+
+	function calculateElementColor(dom, atomicIndex, index) {
+		let r = index,
+			g = atomicIndex + index,
+			b = atomicIndex * 2 + index;
+		setColor(dom, r, g, b, 80, 200);
+	}
+
+	function setColor(dom, r, g, b, min, max) {
+		function treatColorDigit(v) {
+			let rotations = Math.floor(v / 256);
+			if (rotations % 2 === 0 && rotations > 0)
+				v %= 256;
+			else if (rotations % 2 === 1)
+				v = 255 - (v % 256);
+			return (v / 255) * (max - min) + min;
+		}
+		r = treatColorDigit(r);
+		g = treatColorDigit(g);
+		b = treatColorDigit(b);
+		dom.style.backgroundColor = "rgb(" + r + ", " + g + ", " + b + ")";
 	}
 
 })();
