@@ -82,7 +82,7 @@
 		// Credit: https://github.com/Bowserinator
 		ajaxGET("https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json", function (json) {
 			elements = JSON.parse(json).elements;
-			fillTableHTML($("table")[0], NORMAL_LAYOUT);
+			fillTableHTML($("table"), NORMAL_LAYOUT);
 			setInterval(incrementElementColors, FADE_DELAY);
 			$("body").style.setProperty("--fade-time", FADE_DELAY + "ms");
 
@@ -124,6 +124,7 @@
 	function generateElementHTML(index) {
 		let cellDOM = ce("td");
 		cellDOM.className = "element";
+		let link = elements[index].source;
 		let number = index + 1;
 		let symbol = elements[index].symbol;
 		let name = elements[index].name;
@@ -131,6 +132,9 @@
 		let r = Math.random() * 255,
 			g = 255 - index,
 			b = 2 * index;
+		if (link) cellDOM.onclick = function () {
+			window.location.href = link;
+		}
 		if (number) cellDOM.appendChild(ce("span", number, "number"));
 		if (symbol) cellDOM.appendChild(ce("span", symbol, "symbol"));
 		if (name) cellDOM.appendChild(ce("span", name, "name"));
