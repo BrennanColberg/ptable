@@ -45,25 +45,14 @@
 	}
 
 	// layout of the standard periodic table
-	const NORMAL_LAYOUT = [
-		[1, 1],
-		[2, 6],
-		[2, 6],
-		[3, 15],
-		[3, 15],
-		[3, 15, 14],
-		[3, 15, 14]
-	]
-
-	// layout of a periodic table with the L/A series expanded
-	const EXPANDED_LAYOUT = [
-		[1, 1],
-		[2, 6],
-		[2, 6],
-		[3, 15],
-		[3, 15],
-		[17, 15],
-		[17, 15]
+	const LAYOUT = [
+		[1, 0, 1],
+		[2, 0, 6],
+		[2, 0, 6],
+		[3, 0, 15],
+		[3, 0, 15],
+		[3, 14, 15],
+		[3, 14, 15]
 	];
 
 	// millisecond period between color updates
@@ -73,8 +62,12 @@
 	let elements = undefined;
 	// generated DOM elements
 	let elementDOMs = [];
+	// elements within a series
+	let seriesDOMs = [];
 	// index for fading colors
 	let colorIndex = 0;
+	// whether or not L/A series are hidden
+	let seriesHidden = true;
 
 	window.addEventListener("load", function () {
 		// querying someone else's elements data JSON because it exists so
@@ -82,40 +75,58 @@
 		// Credit: https://github.com/Bowserinator
 		ajaxGET("https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json", function (json) {
 			elements = JSON.parse(json).elements;
-			fillTableHTML($("table"), NORMAL_LAYOUT);
+			fillTableHTML($("table"), LAYOUT);
 			setInterval(incrementElementColors, FADE_DELAY);
 			$("body").style.setProperty("--fade-time", FADE_DELAY + "ms");
-
 		});
+		$("#toggleSeries").onclick = toggleSeries;
 	});
 
 	function fillTableHTML(parentDOM, layout) {
 		// gets larger dimensions for iterator
 		let rowCount = layout.length;
 		let columnCount = 0;
+		let seriesLength = 0;
+		console.log(seriesLength);
 		for (let i = 0; i < layout.length; i++) {
 			let entry = layout[i];
-			columnCount = Math.max(columnCount, entry[0] + entry[1]);
+			columnCount = Math.max(columnCount, entry[0] + entry[2]);
+			if (entry[2]) seriesLength = Math.max(seriesLength, entry[1]);
 		}
+		console.log(seriesLength);
 
 		// iterates and creates DOM
 		let elementIndex = 0;
 		for (let row = 0; row < rowCount; row++) {
 			let rowDOM = ce("tr");
 			let rowLayout = layout[row];
-			let addedInvisibleCount = false;
-			for (let col = 1; col <= columnCount; col++) {
-				let isFrontElement = col <= rowLayout[0];
-				let isBackElement = columnCount - col < rowLayout[1];
-				// adds count for L/A series, etc (counted but can't see)
-				if (!isFrontElement && !addedInvisibleCount && rowLayout[2]) {
-					elementIndex += rowLayout[2];
-					addedInvisibleCount = true;
+			// generates left-aligned elements
+			for (let col = 1; col <= rowLayout[0]; col++) {
+				rowDOM.appendChild(generateElementHTML(elementIndex++));
+			}
+			// generates series (hidden)
+			if (rowLayout[2]) {
+				for (let col = 1; col <= rowLayout[1]; col++) {
+					let cell = generateElementHTML(elementIndex++);
+					markAsSeries(cell);
+					rowDOM.appendChild(cell);
 				}
-				rowDOM.appendChild((isFrontElement || isBackElement) ?
-					generateElementHTML(elementIndex++) : // element
-					ce("td") // non-element
-				);
+			}
+			// prints blank series cells for structure
+			let seriesSpacers = seriesLength - rowLayout[1];
+			for (let col = 1; col <= seriesSpacers; col++) {
+				let cell = ce("td");
+				markAsSeries(cell);
+				rowDOM.appendChild(cell);
+			}
+			// prints blank cells for structure (always present)
+			let spacers = columnCount - rowLayout[0] - rowLayout[2];
+			for (let col = 1; col <= spacers; col++) {
+				rowDOM.appendChild(ce("td"));
+			}
+			// generates right-aligned elements
+			for (let col = 1; col <= rowLayout[2]; col++) {
+				rowDOM.appendChild(generateElementHTML(elementIndex++));
 			}
 			parentDOM.appendChild(rowDOM);
 		}
@@ -142,6 +153,11 @@
 		calculateElementColor(cellDOM, index, 0);
 		elementDOMs.push(cellDOM);
 		return cellDOM;
+	}
+
+	function markAsSeries(dom) {
+		dom.classList.add("hidden");
+		seriesDOMs.push(dom);
 	}
 
 	function incrementElementColors() {
@@ -171,6 +187,19 @@
 		g = treatColorDigit(g);
 		b = treatColorDigit(b);
 		dom.style.backgroundColor = "rgb(" + r + ", " + g + ", " + b + ")";
+	}
+
+	function toggleSeries() {
+		if (seriesHidden) {
+			for (let i = 0; i < seriesDOMs.length; i++) {
+				seriesDOMs[i].classList.remove("hidden");
+			}
+		} else {
+			for (let i = 0; i < seriesDOMs.length; i++) {
+				seriesDOMs[i].classList.add("hidden");
+			}
+		}
+		seriesHidden = !seriesHidden;
 	}
 
 })();
