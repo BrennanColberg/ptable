@@ -46,11 +46,11 @@
 
 	// layout of the standard periodic table
 	const LAYOUT = [
-		[1, 1],
-		[2, 6],
-		[2, 6],
-		[3, 15],
-		[3, 15],
+		[1, 1, 0],
+		[2, 6, 0],
+		[2, 6, 0],
+		[3, 15, 0],
+		[3, 15, 0],
 		[3, 15, 14],
 		[3, 15, 14]
 	];
@@ -62,8 +62,12 @@
 	let elements = undefined;
 	// generated DOM elements
 	let elementDOMs = [];
+	// elements within a series
+	let seriesDOMs = [];
 	// index for fading colors
 	let colorIndex = 0;
+	// whether or not L/A series are hidden
+	let seriesHidden = true;
 
 	window.addEventListener("load", function () {
 		// querying someone else's elements data JSON because it exists so
@@ -74,18 +78,22 @@
 			fillTableHTML($("table"), LAYOUT);
 			setInterval(incrementElementColors, FADE_DELAY);
 			$("body").style.setProperty("--fade-time", FADE_DELAY + "ms");
-
 		});
+		$("#toggleSeries").onclick = toggleSeries;
 	});
 
 	function fillTableHTML(parentDOM, layout) {
 		// gets larger dimensions for iterator
 		let rowCount = layout.length;
 		let columnCount = 0;
+		let seriesLength = 0;
+		console.log(seriesLength);
 		for (let i = 0; i < layout.length; i++) {
 			let entry = layout[i];
 			columnCount = Math.max(columnCount, entry[0] + entry[1]);
+			if (entry[2]) seriesLength = Math.max(seriesLength, entry[2]);
 		}
+		console.log(seriesLength);
 
 		// iterates and creates DOM
 		let elementIndex = 0;
@@ -100,12 +108,18 @@
 			if (rowLayout[2]) {
 				for (let col = 1; col <= rowLayout[2]; col++) {
 					let cell = generateElementHTML(elementIndex++);
-					cell.classList.add("series");
-					cell.classList.add("hidden");
+					markAsSeries(cell);
 					rowDOM.appendChild(cell);
 				}
 			}
-			// prints blank cells for structure
+			// prints blank cells for structure (when series is expanded)
+			let seriesSpacers = seriesLength - rowLayout[2];
+			for (let col = 1; col <= seriesSpacers; col++) {
+				let cell = ce("td");
+				markAsSeries(cell);
+				rowDOM.appendChild(cell);
+			}
+			// prints blank cells for structure (always present)
 			let spacers = columnCount - rowLayout[0] - rowLayout[1];
 			for (let col = 1; col <= spacers; col++) {
 				rowDOM.appendChild(ce("td"));
@@ -141,6 +155,11 @@
 		return cellDOM;
 	}
 
+	function markAsSeries(dom) {
+		dom.classList.add("hidden");
+		seriesDOMs.push(dom);
+	}
+
 	function incrementElementColors() {
 		colorIndex += 15;
 		for (let i = 0; i < elementDOMs.length; i++) {
@@ -168,6 +187,19 @@
 		g = treatColorDigit(g);
 		b = treatColorDigit(b);
 		dom.style.backgroundColor = "rgb(" + r + ", " + g + ", " + b + ")";
+	}
+
+	function toggleSeries() {
+		if (seriesHidden) {
+			for (let i = 0; i < seriesDOMs.length; i++) {
+				seriesDOMs[i].classList.remove("hidden");
+			}
+		} else {
+			for (let i = 0; i < seriesDOMs.length; i++) {
+				seriesDOMs[i].classList.add("hidden");
+			}
+		}
+		seriesHidden = !seriesHidden;
 	}
 
 })();
