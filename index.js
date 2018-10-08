@@ -45,7 +45,7 @@
 	}
 
 	// layout of the standard periodic table
-	const NORMAL_LAYOUT = [
+	const LAYOUT = [
 		[1, 1],
 		[2, 6],
 		[2, 6],
@@ -53,17 +53,6 @@
 		[3, 15],
 		[3, 15, 14],
 		[3, 15, 14]
-	]
-
-	// layout of a periodic table with the L/A series expanded
-	const EXPANDED_LAYOUT = [
-		[1, 1],
-		[2, 6],
-		[2, 6],
-		[3, 15],
-		[3, 15],
-		[17, 15],
-		[17, 15]
 	];
 
 	// millisecond period between color updates
@@ -82,7 +71,7 @@
 		// Credit: https://github.com/Bowserinator
 		ajaxGET("https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json", function (json) {
 			elements = JSON.parse(json).elements;
-			fillTableHTML($("table"), NORMAL_LAYOUT);
+			fillTableHTML($("table"), LAYOUT);
 			setInterval(incrementElementColors, FADE_DELAY);
 			$("body").style.setProperty("--fade-time", FADE_DELAY + "ms");
 
@@ -107,11 +96,18 @@
 			for (let col = 1; col <= rowLayout[0]; col++) {
 				rowDOM.appendChild(generateElementHTML(elementIndex++));
 			}
-			// adds numerical count for series
-			if (rowLayout[2]) elementIndex += rowLayout[2];
-			// prints "spacer" blank cells
-			let spacerColumnCount = columnCount - rowLayout[0] - rowLayout[1];
-			for (let col = 1; col <= spacerColumnCount; col++) {
+			// generates series (hidden)
+			if (rowLayout[2]) {
+				for (let col = 1; col <= rowLayout[2]; col++) {
+					let cell = generateElementHTML(elementIndex++);
+					cell.classList.add("series");
+					cell.classList.add("hidden");
+					rowDOM.appendChild(cell);
+				}
+			}
+			// prints blank cells for structure
+			let spacers = columnCount - rowLayout[0] - rowLayout[1];
+			for (let col = 1; col <= spacers; col++) {
 				rowDOM.appendChild(ce("td"));
 			}
 			// generates right-aligned elements

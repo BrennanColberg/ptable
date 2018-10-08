@@ -55,3 +55,7 @@ td {
 .element .mass {
 	font-size: 9pt;
 }
+
+.hidden {
+	display: none;
+}
