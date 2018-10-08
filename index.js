@@ -46,13 +46,13 @@
 
 	// layout of the standard periodic table
 	const LAYOUT = [
-		[1, 1, 0],
-		[2, 6, 0],
-		[2, 6, 0],
-		[3, 15, 0],
-		[3, 15, 0],
-		[3, 15, 14],
-		[3, 15, 14]
+		[1, 0, 1],
+		[2, 0, 6],
+		[2, 0, 6],
+		[3, 0, 15],
+		[3, 0, 15],
+		[3, 14, 15],
+		[3, 14, 15]
 	];
 
 	// millisecond period between color updates
@@ -90,8 +90,8 @@
 		console.log(seriesLength);
 		for (let i = 0; i < layout.length; i++) {
 			let entry = layout[i];
-			columnCount = Math.max(columnCount, entry[0] + entry[1]);
-			if (entry[2]) seriesLength = Math.max(seriesLength, entry[2]);
+			columnCount = Math.max(columnCount, entry[0] + entry[2]);
+			if (entry[2]) seriesLength = Math.max(seriesLength, entry[1]);
 		}
 		console.log(seriesLength);
 
@@ -106,26 +106,26 @@
 			}
 			// generates series (hidden)
 			if (rowLayout[2]) {
-				for (let col = 1; col <= rowLayout[2]; col++) {
+				for (let col = 1; col <= rowLayout[1]; col++) {
 					let cell = generateElementHTML(elementIndex++);
 					markAsSeries(cell);
 					rowDOM.appendChild(cell);
 				}
 			}
-			// prints blank cells for structure (when series is expanded)
-			let seriesSpacers = seriesLength - rowLayout[2];
+			// prints blank series cells for structure
+			let seriesSpacers = seriesLength - rowLayout[1];
 			for (let col = 1; col <= seriesSpacers; col++) {
 				let cell = ce("td");
 				markAsSeries(cell);
 				rowDOM.appendChild(cell);
 			}
 			// prints blank cells for structure (always present)
-			let spacers = columnCount - rowLayout[0] - rowLayout[1];
+			let spacers = columnCount - rowLayout[0] - rowLayout[2];
 			for (let col = 1; col <= spacers; col++) {
 				rowDOM.appendChild(ce("td"));
 			}
 			// generates right-aligned elements
-			for (let col = 1; col <= rowLayout[1]; col++) {
+			for (let col = 1; col <= rowLayout[2]; col++) {
 				rowDOM.appendChild(generateElementHTML(elementIndex++));
 			}
 			parentDOM.appendChild(rowDOM);
