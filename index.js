@@ -103,19 +103,20 @@
 		for (let row = 0; row < rowCount; row++) {
 			let rowDOM = ce("tr");
 			let rowLayout = layout[row];
-			let addedInvisibleCount = false;
-			for (let col = 1; col <= columnCount; col++) {
-				let isFrontElement = col <= rowLayout[0];
-				let isBackElement = columnCount - col < rowLayout[1];
-				// adds count for L/A series, etc (counted but can't see)
-				if (!isFrontElement && !addedInvisibleCount && rowLayout[2]) {
-					elementIndex += rowLayout[2];
-					addedInvisibleCount = true;
-				}
-				rowDOM.appendChild((isFrontElement || isBackElement) ?
-					generateElementHTML(elementIndex++) : // element
-					ce("td") // non-element
-				);
+			// generates left-aligned elements
+			for (let col = 1; col <= rowLayout[0]; col++) {
+				rowDOM.appendChild(generateElementHTML(elementIndex++));
+			}
+			// adds numerical count for series
+			if (rowLayout[2]) elementIndex += rowLayout[2];
+			// prints "spacer" blank cells
+			let spacerColumnCount = columnCount - rowLayout[0] - rowLayout[1];
+			for (let col = 1; col <= spacerColumnCount; col++) {
+				rowDOM.appendChild(ce("td"));
+			}
+			// generates right-aligned elements
+			for (let col = 1; col <= rowLayout[1]; col++) {
+				rowDOM.appendChild(generateElementHTML(elementIndex++));
 			}
 			parentDOM.appendChild(rowDOM);
 		}
