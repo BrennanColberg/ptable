@@ -57,7 +57,7 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 	];
 
 	// millisecond period between color updates
-	const FADE_DELAY = 200;
+	const FADE_DELAY = 2000;
 
 	// JSON of all elements
 	let elements = undefined; // array
@@ -184,7 +184,7 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 
 	function updateColors() {
 		if (colorMode === "Default") {
-			colorIndex += 15;
+			colorIndex += 150;
 			for (let i = 0; i < elementDOMs.length; i++) {
 				const atomicIndex = i;
 				const r = 118 - atomicIndex + colorIndex,
