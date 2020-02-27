@@ -61,7 +61,6 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 
 	// JSON of all elements
 	let elements = undefined; // array
-	let elementsMap = undefined; // map (name: element)
 	// generated DOM elements
 	let elementDOMs = [];
 	// elements within a series
@@ -80,8 +79,6 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 			"https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json",
 			function(json) {
 				elements = JSON.parse(json).elements;
-				elementsMap = {};
-				elements.forEach(element => (elementsMap[element.name] = element));
 				fillTableHTML($("table"), LAYOUT);
 				updateColors();
 				setInterval(updateColors, FADE_DELAY);
@@ -153,20 +150,14 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 		let number = index + 1;
 		let symbol = elements[index].symbol;
 		let name = elements[index].name;
-		let mass = Math.round(elements[index].atomic_mass * 1000) / 1000;
-		let electronegativity = elements[index].electronegativity_pauling || "–";
 		if (link)
 			cellDOM.onclick = function() {
 				window.location.href = link;
 			};
-		if (number) cellDOM.appendChild(ce("span", number, "number"));
-		if (symbol) cellDOM.appendChild(ce("span", symbol, "symbol"));
-		if (name) cellDOM.appendChild(ce("span", name, "name"));
-		if (mass) cellDOM.appendChild(ce("span", mass, "data mass"));
-		if (electronegativity)
-			cellDOM.appendChild(
-				ce("span", electronegativity, "data electronegativity")
-			);
+		cellDOM.appendChild(ce("span", number, "number"));
+		cellDOM.appendChild(ce("span", symbol, "symbol"));
+		cellDOM.appendChild(ce("span", name, "name"));
+		cellDOM.appendChild(ce("span", "", "data"));
 		cellDOM.onmouseenter = function() {
 			startHover(this);
 		};
@@ -191,17 +182,12 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 					g = atomicIndex + colorIndex * 1.1,
 					b = atomicIndex * 2 + colorIndex * 1.2;
 				setColor(elementDOMs[i], r, g, b, 125, 225);
+				elementDOMs[i].querySelector(".data").textContent =
+					Math.round(elements[i].atomic_mass * 1000) / 1000;
 			}
-			document.documentElement.style.setProperty(
-				"--electronegativity-opacity",
-				"0"
-			);
-			document.documentElement.style.setProperty("--mass-opacity", "1");
 		} else if (colorMode === "Electronegativity") {
 			for (let i = 0; i < elementDOMs.length; i++) {
-				const elementDOM = elementDOMs[i];
-				const name = elementDOM.querySelector(".name").textContent;
-				const element = elementsMap[name];
+				const element = elements[i];
 				const electronegativity = element.electronegativity_pauling;
 				if (electronegativity) {
 					const scaledEN = Math.floor(
@@ -213,6 +199,8 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 				} else {
 					setColor(elementDOMs[i], 128, 128, 128, 125, 255);
 				}
+				elementDOMs[i].querySelector(".data").textContent =
+					electronegativity || "—";
 			}
 			document.documentElement.style.setProperty(
 				"--electronegativity-opacity",
