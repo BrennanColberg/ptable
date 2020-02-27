@@ -200,13 +200,12 @@
 			}
 		}
 		seriesHidden = !seriesHidden;
+		updateElementSize();
 	}
 
 	// maintains 5vw because text size doesn't update otherwise
 	function updateElementSize() {
-		document.documentElement.style.setProperty(
-			"--element-size",
-			window.innerWidth / 20 + "px"
-		);
+		const size = window.innerWidth / (seriesHidden ? 20 : 37);
+		document.documentElement.style.setProperty("--element-size", size + "px");
 	}
 })();
