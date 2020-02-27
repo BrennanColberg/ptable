@@ -1,6 +1,5 @@
 "use strict";
-(function () {
-
+(function() {
 	/***** GENERAL TOOLBOX METHODS *****/
 
 	/**
@@ -10,11 +9,9 @@
 	 */
 	function ajaxGET(url, onSuccess) {
 		fetch(url) // no credentials, querying GitHub raw user content
-			.then(function (r) {
+			.then(function(r) {
 				if (r.status >= 200 && r.status < 300) return r.text();
-				else return Promise.reject(
-					new Error(r.status + ": " + r.statusText)
-				);
+				else return Promise.reject(new Error(r.status + ": " + r.statusText));
 			})
 			.then(onSuccess)
 			.catch(console.log);
@@ -69,18 +66,22 @@
 	// whether or not L/A series are hidden
 	let seriesHidden = true;
 
-	window.addEventListener("load", function () {
+	window.addEventListener("load", function() {
 		// querying someone else's elements data JSON because it exists so
 		// why should I make my own?
 		// Credit: https://github.com/Bowserinator
-		ajaxGET("https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json", function (json) {
-			elements = JSON.parse(json).elements;
-			fillTableHTML($("table"), LAYOUT);
-			setInterval(incrementElementColors, FADE_DELAY);
-			$("body").style.setProperty("--fade-time", FADE_DELAY + "ms");
-		});
+		ajaxGET(
+			"https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json",
+			function(json) {
+				elements = JSON.parse(json).elements;
+				fillTableHTML($("table"), LAYOUT);
+				setInterval(incrementElementColors, FADE_DELAY);
+				$("body").style.setProperty("--fade-time", FADE_DELAY + "ms");
+			}
+		);
 		$("#toggleSeries").onclick = toggleSeries;
 	});
+	window.addEventListener("resize", updateElementSize);
 
 	function fillTableHTML(parentDOM, layout) {
 		// gets larger dimensions for iterator
@@ -143,9 +144,10 @@
 		let r = Math.random() * 255,
 			g = 255 - index,
 			b = 2 * index;
-		if (link) cellDOM.onclick = function () {
-			window.location.href = link;
-		}
+		if (link)
+			cellDOM.onclick = function() {
+				window.location.href = link;
+			};
 		if (number) cellDOM.appendChild(ce("span", number, "number"));
 		if (symbol) cellDOM.appendChild(ce("span", symbol, "symbol"));
 		if (name) cellDOM.appendChild(ce("span", name, "name"));
@@ -168,7 +170,7 @@
 	}
 
 	function calculateElementColor(dom, atomicIndex, index) {
-		let r = (118 - atomicIndex) + index,
+		let r = 118 - atomicIndex + index,
 			g = atomicIndex + index * 1.1,
 			b = atomicIndex * 2 + index * 1.2;
 		setColor(dom, r, g, b, 125, 225);
@@ -177,10 +179,8 @@
 	function setColor(dom, r, g, b, min, max) {
 		function treatColorDigit(v) {
 			let rotations = Math.floor(v / 256);
-			if (rotations % 2 === 0 && rotations > 0)
-				v %= 256;
-			else if (rotations % 2 === 1)
-				v = 255 - (v % 256);
+			if (rotations % 2 === 0 && rotations > 0) v %= 256;
+			else if (rotations % 2 === 1) v = 255 - (v % 256);
 			return Math.floor((v / 255) * (max - min) + min);
 		}
 		r = treatColorDigit(r);
@@ -202,4 +202,11 @@
 		seriesHidden = !seriesHidden;
 	}
 
+	// maintains 5vw because text size doesn't update otherwise
+	function updateElementSize() {
+		document.documentElement.style.setProperty(
+			"--element-size",
+			window.innerWidth / 20 + "px"
+		);
+	}
 })();

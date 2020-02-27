@@ -1,20 +1,38 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald');
+@import url("https://fonts.googleapis.com/css?family=Oswald");
+
+:root {
+	--fade-time: 100ms;
+	--element-size: 5vw;
+}
 
 body {
-	--fade-time: 100ms;
+	margin: 0;
+	height: 100vh;
+	width: 100vw;
+	min-height: 100vh;
+	min-width: 100vw;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-items: center;
 }
 
 table {
 	table-layout: fixed;
+	max-width: 100vw;
+	overflow-x: hidden;
 }
 
 td {
 	box-sizing: border-box;
-	padding: 10px;
-	width: 100px;
-	height: 100px;
-	min-width: 100px;
-	min-height: 100px;
+	padding: calc(var(--element-size) / 10);
+	width: calc(var(--element-size));
+	height: calc(var(--element-size));
+	min-width: calc(var(--element-size));
+	min-height: calc(var(--element-size));
+	max-width: calc(var(--element-size));
+	max-height: calc(var(--element-size));
+	overflow: hidden;
 	position: relative;
 }
 
@@ -25,7 +43,7 @@ td {
 	transition-property: background-color;
 	transition-duration: var(--fade-time);
 	transition-timing-function: linear;
-	border: 3px solid black;
+	border: calc(var(--element-size) / 30) solid black;
 	text-align: center;
 	font-family: sans-serif;
 	font-weight: bold;
@@ -38,22 +56,22 @@ td {
 
 .element .number {
 	position: absolute;
-	right: 5px;
-	top: 5px;
-	font-size: 12pt;
+	right: calc(var(--element-size) / 20);
+	top: calc(var(--element-size) / 20);
+	font-size: calc(var(--element-size) / 6);
 }
 
 .element .symbol {
-	font-size: 24pt;
+	font-size: calc(var(--element-size) / 3);
 }
 
 .element .name {
-	font-size: 11pt;
+	font-size: calc(var(--element-size) / 7);
 	font-family: "Oswald";
 }
 
 .element .mass {
-	font-size: 9pt;
+	font-size: calc(var(--element-size) / 8);
 }
 
 .hidden {
