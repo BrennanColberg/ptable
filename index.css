@@ -77,3 +77,8 @@ td {
 .hidden {
 	display: none;
 }
+
+#toggleSeries {
+	position: absolute;
+	bottom: 10px;
+}
