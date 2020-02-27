@@ -209,7 +209,7 @@
 
 	// maintains 5vw because text size doesn't update otherwise
 	function updateElementSize() {
-		const size = window.innerWidth / (seriesHidden ? 20 : 37);
+		const size = window.innerWidth / (seriesHidden ? 20 : 35.7);
 		document.documentElement.style.setProperty("--element-size", size + "px");
 	}
 
