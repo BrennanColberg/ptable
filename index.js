@@ -1,4 +1,8 @@
 "use strict";
+
+const MIN_ELECTRONEGATIVITY = 0.79;
+const MAX_ELECTRONEGATIVITY = 4.0;
+
 (function() {
 	/***** GENERAL TOOLBOX METHODS *****/
 
@@ -56,7 +60,8 @@
 	const FADE_DELAY = 200;
 
 	// JSON of all elements
-	let elements = undefined;
+	let elements = undefined; // array
+	let elementsMap = undefined; // map (name: element)
 	// generated DOM elements
 	let elementDOMs = [];
 	// elements within a series
@@ -65,6 +70,7 @@
 	let colorIndex = 0;
 	// whether or not L/A series are hidden
 	let seriesHidden = true;
+	let colorMode = "Default"; // "Default" or "Electronegativity"
 
 	window.addEventListener("load", function() {
 		// querying someone else's elements data JSON because it exists so
@@ -74,12 +80,20 @@
 			"https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json",
 			function(json) {
 				elements = JSON.parse(json).elements;
+				elementsMap = {};
+				elements.forEach(element => (elementsMap[element.name] = element));
 				fillTableHTML($("table"), LAYOUT);
-				setInterval(incrementElementColors, FADE_DELAY);
-				$("body").style.setProperty("--fade-time", FADE_DELAY + "ms");
+				updateColors();
+				setInterval(updateColors, FADE_DELAY);
+				document.documentElement.style.setProperty(
+					"--fade-time",
+					FADE_DELAY + "ms"
+				);
 			}
 		);
 		$("#toggleSeries").onclick = toggleSeries;
+		$("#show-electronegativity").onclick = showElectronegativity;
+		$("#hide-electronegativity").onclick = hideElectronegativity;
 	});
 	window.addEventListener("resize", updateElementSize);
 	window.addEventListener("mousemove", updateTooltipPosition);
@@ -89,13 +103,11 @@
 		let rowCount = layout.length;
 		let columnCount = 0;
 		let seriesLength = 0;
-		console.log(seriesLength);
 		for (let i = 0; i < layout.length; i++) {
 			let entry = layout[i];
 			columnCount = Math.max(columnCount, entry[0] + entry[2]);
 			if (entry[2]) seriesLength = Math.max(seriesLength, entry[1]);
 		}
-		console.log(seriesLength);
 
 		// iterates and creates DOM
 		let elementIndex = 0;
@@ -156,7 +168,6 @@
 		cellDOM.onmouseleave = function() {
 			endHover(this);
 		};
-		calculateElementColor(cellDOM, index, 0);
 		elementDOMs.push(cellDOM);
 		return cellDOM;
 	}
@@ -166,21 +177,46 @@
 		seriesDOMs.push(dom);
 	}
 
-	function incrementElementColors() {
-		colorIndex += 15;
-		for (let i = 0; i < elementDOMs.length; i++) {
-			calculateElementColor(elementDOMs[i], i, colorIndex);
+	function updateColors() {
+		if (colorMode === "Default") {
+			colorIndex += 15;
+			for (let i = 0; i < elementDOMs.length; i++) {
+				const atomicIndex = i;
+				const r = 118 - atomicIndex + colorIndex,
+					g = atomicIndex + colorIndex * 1.1,
+					b = atomicIndex * 2 + colorIndex * 1.2;
+				setColor(elementDOMs[i], r, g, b, 125, 225);
+			}
+		} else if (colorMode === "Electronegativity") {
+			for (let i = 0; i < elementDOMs.length; i++) {
+				const elementDOM = elementDOMs[i];
+				const name = elementDOM.querySelector(".name").textContent;
+				const element = elementsMap[name];
+				const electronegativity = element.electronegativity_pauling;
+				if (electronegativity) {
+					const scaledEN = Math.floor(
+						((electronegativity - MIN_ELECTRONEGATIVITY) /
+							(MAX_ELECTRONEGATIVITY - MIN_ELECTRONEGATIVITY)) *
+							255
+					);
+					setColor(elementDOMs[i], 255, 255 - scaledEN, 255 - scaledEN, 0, 255);
+				} else {
+					setColor(elementDOMs[i], 128, 128, 128, 125, 255);
+				}
+			}
 		}
 	}
 
-	function calculateElementColor(dom, atomicIndex, index) {
-		let r = 118 - atomicIndex + index,
-			g = atomicIndex + index * 1.1,
-			b = atomicIndex * 2 + index * 1.2;
-		setColor(dom, r, g, b, 125, 225);
-	}
-
-	function setColor(dom, r, g, b, min, max) {
+	/**
+	 * Sets the color of an element in the DOM.
+	 * @param {*} dom DOM element to set
+	 * @param {Number} r ≡ red amount (mod 256)
+	 * @param {Number} g ≡ green amount (mod 256)
+	 * @param {Number} b ≡ blue amount (mod 256)
+	 * @param {*} min bottom of range to map 0-255 R/G/B values into
+	 * @param {*} max top of range ot map 0-255 R/G/B values into
+	 */
+	function setColor(dom, r, g, b, min = 0, max = 255) {
 		function treatColorDigit(v) {
 			let rotations = Math.floor(v / 256);
 			if (rotations % 2 === 0 && rotations > 0) v %= 256;
@@ -191,20 +227,6 @@
 		g = treatColorDigit(g);
 		b = treatColorDigit(b);
 		dom.style.backgroundColor = "rgb(" + r + ", " + g + ", " + b + ")";
-	}
-
-	function toggleSeries() {
-		if (seriesHidden) {
-			for (let i = 0; i < seriesDOMs.length; i++) {
-				seriesDOMs[i].classList.remove("hidden");
-			}
-		} else {
-			for (let i = 0; i < seriesDOMs.length; i++) {
-				seriesDOMs[i].classList.add("hidden");
-			}
-		}
-		seriesHidden = !seriesHidden;
-		updateElementSize();
 	}
 
 	// maintains 5vw because text size doesn't update otherwise
@@ -234,5 +256,33 @@
 	function endHover(cellDOM) {
 		const tooltip = document.querySelector("#tooltip");
 		tooltip.classList.add("hidden");
+	}
+
+	/* BUTTON FUNCTIONS */
+
+	function toggleSeries() {
+		if (seriesHidden) {
+			for (let i = 0; i < seriesDOMs.length; i++) {
+				seriesDOMs[i].classList.remove("hidden");
+			}
+		} else {
+			for (let i = 0; i < seriesDOMs.length; i++) {
+				seriesDOMs[i].classList.add("hidden");
+			}
+		}
+		seriesHidden = !seriesHidden;
+		updateElementSize();
+	}
+
+	function showElectronegativity() {
+		colorMode = "Electronegativity";
+		$("#show-electronegativity").classList.add("hidden");
+		$("#hide-electronegativity").classList.remove("hidden");
+	}
+
+	function hideElectronegativity() {
+		colorMode = "Default";
+		$("#show-electronegativity").classList.remove("hidden");
+		$("#hide-electronegativity").classList.add("hidden");
 	}
 })();
