@@ -3,6 +3,8 @@
 :root {
 	--fade-time: 100ms;
 	--element-size: 5vw;
+	--electronegativity-display: none;
+	--mass-display: default;
 }
 
 body {
@@ -71,8 +73,14 @@ td {
 	font-family: "Oswald";
 }
 
-.element .mass {
+.element .data {
 	font-size: calc(var(--element-size) / 8);
+}
+.element .mass {
+	display: var(--mass-display);
+}
+.element .electronegativity {
+	display: var(--electronegativity-display);
 }
 
 .hidden {

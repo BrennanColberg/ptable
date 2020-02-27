@@ -1,7 +1,7 @@
 "use strict";
 
+const MAX_ELECTRONEGATIVITY = 3.98;
 const MIN_ELECTRONEGATIVITY = 0.79;
-const MAX_ELECTRONEGATIVITY = 4.0;
 
 (function() {
 	/***** GENERAL TOOLBOX METHODS *****/
@@ -154,6 +154,7 @@ const MAX_ELECTRONEGATIVITY = 4.0;
 		let symbol = elements[index].symbol;
 		let name = elements[index].name;
 		let mass = Math.round(elements[index].atomic_mass * 1000) / 1000;
+		let electronegativity = elements[index].electronegativity_pauling || "–";
 		if (link)
 			cellDOM.onclick = function() {
 				window.location.href = link;
@@ -161,7 +162,11 @@ const MAX_ELECTRONEGATIVITY = 4.0;
 		if (number) cellDOM.appendChild(ce("span", number, "number"));
 		if (symbol) cellDOM.appendChild(ce("span", symbol, "symbol"));
 		if (name) cellDOM.appendChild(ce("span", name, "name"));
-		if (mass) cellDOM.appendChild(ce("span", mass, "mass"));
+		if (mass) cellDOM.appendChild(ce("span", mass, "data mass"));
+		if (electronegativity)
+			cellDOM.appendChild(
+				ce("span", electronegativity, "data electronegativity")
+			);
 		cellDOM.onmouseenter = function() {
 			startHover(this);
 		};
@@ -187,6 +192,11 @@ const MAX_ELECTRONEGATIVITY = 4.0;
 					b = atomicIndex * 2 + colorIndex * 1.2;
 				setColor(elementDOMs[i], r, g, b, 125, 225);
 			}
+			document.documentElement.style.setProperty(
+				"--electronegativity-display",
+				"none"
+			);
+			document.documentElement.style.setProperty("--mass-display", "default");
 		} else if (colorMode === "Electronegativity") {
 			for (let i = 0; i < elementDOMs.length; i++) {
 				const elementDOM = elementDOMs[i];
@@ -204,6 +214,11 @@ const MAX_ELECTRONEGATIVITY = 4.0;
 					setColor(elementDOMs[i], 128, 128, 128, 125, 255);
 				}
 			}
+			document.documentElement.style.setProperty(
+				"--electronegativity-display",
+				"default"
+			);
+			document.documentElement.style.setProperty("--mass-display", "none");
 		}
 	}
 
