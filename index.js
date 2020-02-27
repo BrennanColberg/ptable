@@ -196,7 +196,7 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 				"--electronegativity-display",
 				"none"
 			);
-			document.documentElement.style.setProperty("--mass-display", "default");
+			document.documentElement.style.setProperty("--mass-display", "block");
 		} else if (colorMode === "Electronegativity") {
 			for (let i = 0; i < elementDOMs.length; i++) {
 				const elementDOM = elementDOMs[i];
@@ -216,7 +216,7 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 			}
 			document.documentElement.style.setProperty(
 				"--electronegativity-display",
-				"default"
+				"block"
 			);
 			document.documentElement.style.setProperty("--mass-display", "none");
 		}

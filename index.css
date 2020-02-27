@@ -4,7 +4,7 @@
 	--fade-time: 100ms;
 	--element-size: 5vw;
 	--electronegativity-display: none;
-	--mass-display: default;
+	--mass-display: block;
 }
 
 body {
