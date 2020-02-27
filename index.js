@@ -57,7 +57,7 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 	];
 
 	// millisecond period between color updates
-	const FADE_DELAY = 2000;
+	const FADE_DELAY = 1000;
 
 	// JSON of all elements
 	let elements = undefined; // array
@@ -184,7 +184,7 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 
 	function updateColors() {
 		if (colorMode === "Default") {
-			colorIndex += 150;
+			colorIndex += 75;
 			for (let i = 0; i < elementDOMs.length; i++) {
 				const atomicIndex = i;
 				const r = 118 - atomicIndex + colorIndex,
@@ -193,10 +193,10 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 				setColor(elementDOMs[i], r, g, b, 125, 225);
 			}
 			document.documentElement.style.setProperty(
-				"--electronegativity-display",
-				"none"
+				"--electronegativity-opacity",
+				"0"
 			);
-			document.documentElement.style.setProperty("--mass-display", "block");
+			document.documentElement.style.setProperty("--mass-opacity", "1");
 		} else if (colorMode === "Electronegativity") {
 			for (let i = 0; i < elementDOMs.length; i++) {
 				const elementDOM = elementDOMs[i];
@@ -215,10 +215,10 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 				}
 			}
 			document.documentElement.style.setProperty(
-				"--electronegativity-display",
-				"block"
+				"--electronegativity-opacity",
+				"1"
 			);
-			document.documentElement.style.setProperty("--mass-display", "none");
+			document.documentElement.style.setProperty("--mass-opacity", "0");
 		}
 	}
 
@@ -293,11 +293,13 @@ const MIN_ELECTRONEGATIVITY = 0.79;
 		colorMode = "Electronegativity";
 		$("#show-electronegativity").classList.add("hidden");
 		$("#hide-electronegativity").classList.remove("hidden");
+		updateColors();
 	}
 
 	function hideElectronegativity() {
 		colorMode = "Default";
 		$("#show-electronegativity").classList.remove("hidden");
 		$("#hide-electronegativity").classList.add("hidden");
+		updateColors();
 	}
 })();

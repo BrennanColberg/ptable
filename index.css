@@ -3,8 +3,8 @@
 :root {
 	--fade-time: 100ms;
 	--element-size: 5vw;
-	--electronegativity-display: none;
-	--mass-display: block;
+	--electronegativity-opacity: 0;
+	--mass-opacity: 1;
 }
 
 body {
@@ -75,12 +75,15 @@ td {
 
 .element .data {
 	font-size: calc(var(--element-size) / 8);
+	transition: opacity var(--fade-time);
+	position: absolute;
+	width: 80%;
 }
 .element .mass {
-	display: var(--mass-display);
+	opacity: var(--mass-opacity);
 }
 .element .electronegativity {
-	display: var(--electronegativity-display);
+	opacity: var(--electronegativity-opacity);
 }
 
 .hidden {
