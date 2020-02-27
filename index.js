@@ -82,6 +82,7 @@
 		$("#toggleSeries").onclick = toggleSeries;
 	});
 	window.addEventListener("resize", updateElementSize);
+	window.addEventListener("mousemove", updateTooltipPosition);
 
 	function fillTableHTML(parentDOM, layout) {
 		// gets larger dimensions for iterator
@@ -141,9 +142,6 @@
 		let symbol = elements[index].symbol;
 		let name = elements[index].name;
 		let mass = Math.round(elements[index].atomic_mass * 1000) / 1000;
-		let r = Math.random() * 255,
-			g = 255 - index,
-			b = 2 * index;
 		if (link)
 			cellDOM.onclick = function() {
 				window.location.href = link;
@@ -152,6 +150,12 @@
 		if (symbol) cellDOM.appendChild(ce("span", symbol, "symbol"));
 		if (name) cellDOM.appendChild(ce("span", name, "name"));
 		if (mass) cellDOM.appendChild(ce("span", mass, "mass"));
+		cellDOM.onmouseenter = function() {
+			startHover(this);
+		};
+		cellDOM.onmouseleave = function() {
+			endHover(this);
+		};
 		calculateElementColor(cellDOM, index, 0);
 		elementDOMs.push(cellDOM);
 		return cellDOM;
@@ -207,5 +211,28 @@
 	function updateElementSize() {
 		const size = window.innerWidth / (seriesHidden ? 20 : 37);
 		document.documentElement.style.setProperty("--element-size", size + "px");
+	}
+
+	function updateTooltipPosition(event) {
+		const tooltip = document.querySelector("#tooltip");
+		tooltip.style.setProperty(
+			"left",
+			event.clientX - tooltip.clientWidth / 2 + "px"
+		);
+		tooltip.style.setProperty("top", event.clientY + 15 + "px");
+	}
+
+	function startHover(cellDOM) {
+		const tooltip = document.querySelector("#tooltip");
+		const elementContainer = tooltip.querySelector("#element");
+		while (elementContainer.childElementCount)
+			elementContainer.removeChild(elementContainer.firstChild);
+		elementContainer.appendChild(cellDOM.cloneNode(true));
+		tooltip.classList.remove("hidden");
+	}
+
+	function endHover(cellDOM) {
+		const tooltip = document.querySelector("#tooltip");
+		tooltip.classList.add("hidden");
 	}
 })();

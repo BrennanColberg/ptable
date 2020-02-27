@@ -82,3 +82,19 @@ td {
 	position: absolute;
 	bottom: 10px;
 }
+
+#tooltip {
+	position: fixed;
+	max-width: 80vw;
+	left: 0px;
+	opacity: 1;
+	transition: opacity 0.1s linear 0.2s;
+}
+#tooltip.hidden {
+	display: inherit;
+	opacity: 0;
+}
+
+#tooltip #element {
+	--element-size: 150px;
+}
